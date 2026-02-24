@@ -1,0 +1,257 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Question Builder — Proctored Test</title>
+  <link rel="stylesheet" href="builder.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">Question Builder</div>
+    <div class="spacer"></div>
+    <label class="inline">
+      Title
+      <input id="metaTitle" type="text" value="Proctored Test" />
+    </label>
+    <label class="inline">
+      Duration (min)
+      <input id="metaDuration" type="number" value="48" min="1" />
+    </label>
+    <div class="buttons">
+      <button id="btnAddMcq" class="btn">Add MCQ</button>
+      <button id="btnAddMatrix" class="btn">Add Matrix</button>
+      <button id="btnAddGroup" class="btn">Add Topic Group</button>
+      <button id="btnAddShort" class="btn">Add Short Answer</button>
+      <button id="btnAddParagraph" class="btn">Add Paragraph</button>
+      <label for="importJson" class="btn light">Import JSON</label>
+      <input id="importJson" type="file" accept="application/json" hidden />
+      <button id="btnExportJson" class="btn light">Export JSON</button>
+      <button id="btnSaveDraft" class="btn light">Save Draft</button>
+      <button id="btnClearAll" class="btn danger">Clear All</button>
+    </div>
+  </header>
+
+  <main>
+    <div id="cards"></div>
+  </main>
+
+  <template id="tpl-mcq">
+    <div class="card" data-type="mcq">
+      <div class="card-head">
+        <span class="badge">MCQ</span>
+        <div class="move">
+          <button class="icon up" title="Move up">▲</button>
+          <button class="icon down" title="Move down">▼</button>
+        </div>
+        <div class="tools">
+          <button class="btn small light duplicate">Duplicate</button>
+          <button class="btn small danger delete">Delete</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <label>Question
+          <textarea class="q-prompt" rows="2" placeholder="Your MCQ question"></textarea>
+        </label>
+        <div class="row">
+          <label class="switch">
+            <input type="checkbox" class="q-required" />
+            <span>Required</span>
+          </label>
+        </div>
+        <div class="options">
+          <div class="options-list"></div>
+          <button class="link add-option" type="button">+ Add option</button>
+        </div>
+        <div class="stimulus">
+          <label>Attach image (optional)
+            <input type="file" accept="image/*" class="q-image" />
+          </label>
+          <img class="q-image-preview" alt="" />
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="tpl-matrix">
+    <div class="card" data-type="matrix">
+      <div class="card-head">
+        <span class="badge">Matrix</span>
+        <div class="move">
+          <button class="icon up" title="Move up">▲</button>
+          <button class="icon down" title="Move down">▼</button>
+        </div>
+        <div class="tools">
+          <button class="btn small light duplicate">Duplicate</button>
+          <button class="btn small danger delete">Delete</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <label>Prompt
+          <textarea class="q-prompt" rows="2" placeholder="Rate each item"></textarea>
+        </label>
+        <div class="row">
+          <label class="switch">
+            <input type="checkbox" class="q-required" />
+            <span>Required</span>
+          </label>
+        </div>
+        <div class="matrix-edit">
+          <div class="matrix-cols">
+            <div class="label">Columns</div>
+            <div class="col-list"></div>
+            <button class="link add-col" type="button">+ Add column</button>
+          </div>
+          <div class="matrix-rows">
+            <div class="label">Rows</div>
+            <div class="row-list"></div>
+            <button class="link add-row" type="button">+ Add row</button>
+          </div>
+        </div>
+        <div class="stimulus">
+          <label>Attach image (optional)
+            <input type="file" accept="image/*" class="q-image" />
+          </label>
+          <img class="q-image-preview" alt="" />
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="tpl-group">
+    <div class="card" data-type="group">
+      <div class="card-head">
+        <span class="badge">Topic Group</span>
+        <div class="move">
+          <button class="icon up" title="Move up">▲</button>
+          <button class="icon down" title="Move down">▼</button>
+        </div>
+        <div class="tools">
+          <button class="btn small light duplicate">Duplicate</button>
+          <button class="btn small danger delete">Delete</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <label>Topic / Prompt
+          <textarea class="q-prompt" rows="2" placeholder="Enter topic or stimulus text"></textarea>
+        </label>
+        <div class="row">
+          <label class="switch">
+            <input type="checkbox" class="q-required" />
+            <span>All sub‑questions required</span>
+          </label>
+        </div>
+        <div class="stimulus">
+          <label>Attach image (optional)
+            <input type="file" accept="image/*" class="q-image" />
+          </label>
+          <img class="q-image-preview" alt="" />
+        </div>
+        <div class="subqs">
+          <div class="subq-list"></div>
+          <button class="link add-subq" type="button">+ Add MCQ to group</button>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="tpl-short">
+    <div class="card" data-type="short">
+      <div class="card-head">
+        <span class="badge">Short Answer</span>
+        <div class="move">
+          <button class="icon up" title="Move up">▲</button>
+          <button class="icon down" title="Move down">▼</button>
+        </div>
+        <div class="tools">
+          <button class="btn small light duplicate">Duplicate</button>
+          <button class="btn small danger delete">Delete</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <label>Prompt
+          <textarea class="q-prompt" rows="2" placeholder="Your short answer prompt"></textarea>
+        </label>
+        <div class="row">
+          <label class="switch">
+            <input type="checkbox" class="q-required" />
+            <span>Required</span>
+          </label>
+        </div>
+        <label class="inline small">Max length
+          <input type="number" class="q-maxlen" min="1" placeholder="e.g., 200" />
+        </label>
+      </div>
+    </div>
+  </template>
+
+  <template id="tpl-paragraph">
+    <div class="card" data-type="paragraph">
+      <div class="card-head">
+        <span class="badge">Paragraph</span>
+        <div class="move">
+          <button class="icon up" title="Move up">▲</button>
+          <button class="icon down" title="Move down">▼</button>
+        </div>
+        <div class="tools">
+          <button class="btn small light duplicate">Duplicate</button>
+          <button class="btn small danger delete">Delete</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <label>Prompt
+          <textarea class="q-prompt" rows="2" placeholder="Your paragraph prompt"></textarea>
+        </label>
+        <div class="row">
+          <label class="switch">
+            <input type="checkbox" class="q-required" />
+            <span>Required</span>
+          </label>
+        </div>
+        <label class="inline small">Max length
+          <input type="number" class="q-maxlen" min="1" placeholder="e.g., 1000" />
+        </label>
+      </div>
+    </div>
+  </template>
+
+  <template id="tpl-option">
+    <div class="option-row">
+      <input type="text" class="opt-input" placeholder="Option text" />
+      <button class="icon remove" title="Remove">✖</button>
+    </div>
+  </template>
+
+  <template id="tpl-col">
+    <div class="col-row">
+      <input type="text" class="col-input" placeholder="Column label" />
+      <button class="icon remove" title="Remove">✖</button>
+    </div>
+  </template>
+
+  <template id="tpl-row">
+    <div class="row-row">
+      <input type="text" class="row-input" placeholder="Row label" />
+      <button class="icon remove" title="Remove">✖</button>
+    </div>
+  </template>
+
+  <template id="tpl-subq">
+    <div class="subq">
+      <label>Question
+        <input type="text" class="subq-prompt" placeholder="MCQ under topic" />
+      </label>
+      <div class="options">
+        <div class="options-list"></div>
+        <button class="link add-option" type="button">+ Add option</button>
+      </div>
+      <div class="subq-tools">
+        <button class="icon remove" title="Remove sub‑question">✖</button>
+      </div>
+    </div>
+  </template>
+
+  <script src="builder.js"></script>
+</body>
+</html>
